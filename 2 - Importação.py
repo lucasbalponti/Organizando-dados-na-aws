@@ -17,10 +17,20 @@ diagnosticos.drop(diagnosticos.columns[len(diagnosticos.columns)-1], axis=1, inp
 
 # Criando função para carregar os dados
 def carregar_dados(conn, df, tabela, colunas):
+   
+    ## Criando um cursor para realizar ações no banco de dados
     cur = conn.cursor()
+
+    ## Criando uma variável que irá representar um arquivo ("virtualmente")
     output = io.StringIO()
+
+    ## Exportando o banco de dados para o arquivo "virtual"
     df.to_csv(output, sep='\t', header = False, index = False)
+
+    ## Trazendo o cursor do arquivo "virutal" para o início
     output.seek(0)
+    
+    ## Copiando a tabela e commitando se tudo der certo; se não realizando rollback
     try:
         cur.copy_from(output, tabela, null = "", columns = colunas)
         conn.commit()
